@@ -7,14 +7,7 @@ import React, {
 } from 'react';
 import { TextField, Paper, List, ListItem, ListItemText, Box } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import { fetchAutocompleteData } from '../api/autocompleteApi';
-
-interface AutocompleteItem {
-  id: string;
-  name: string;
-  category: string;
-  value: string | number;
-}
+import { fetchAutocompleteData, AutocompleteItem } from '../api/autocompleteApi';
 
 interface FormulaInputProps {
   placeholder?: string;
@@ -27,10 +20,10 @@ const FormulaInput: React.FC<FormulaInputProps> = ({ placeholder }) => {
   const [cursorPos, setCursorPos] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const { data: suggestions = [] } = useQuery<AutocompleteItem[], Error>({
+  const { data: suggestions = [] } = useQuery<AutocompleteItem[]>({
     queryKey: ['autocompleteData'],
     queryFn: fetchAutocompleteData,
-  }) as { data: AutocompleteItem[] };
+  });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -94,9 +87,7 @@ const FormulaInput: React.FC<FormulaInputProps> = ({ placeholder }) => {
   let filtered: AutocompleteItem[] = [];
   if (showDropdown && partialTokenStart !== null) {
     const token = formulaText.slice(partialTokenStart, cursorPos).toLowerCase();
-    filtered = Array.isArray(suggestions)
-      ? suggestions.filter((s) => s.name.toLowerCase().includes(token))
-      : [];
+    filtered = suggestions.filter((s) => s.name.toLowerCase().includes(token));
   }
 
   return (
